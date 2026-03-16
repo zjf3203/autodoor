@@ -23,8 +23,7 @@ from core.proxy import OCRProxy, TimedProxy, NumberProxy, ScriptProxy, ColorProx
 from input.permissions import PermissionManager
 from input.controller import InputController
 from input.keyboard import setup_shortcuts
-from utils.version import VersionChecker, open_bilibili, open_tool_intro
-from utils.tesseract import TesseractManager
+from utils.tesseract import TesseractManager  # 移除了VersionChecker和open相关导入
 from modules.ocr import OCRModule
 from modules.timed import TimedModule
 from modules.number import NumberModule
@@ -124,7 +123,7 @@ class AutoDoorOCR:
     def _init_managers(self):
         self.logging_manager = LoggingManager(self)
         self.logging_manager.log_message(f"[{self.platform_adapter.platform}] 日志文件路径: {self.log_file_path}")
-        self.version_checker = VersionChecker(self)
+        # 移除了version_checker初始化
         self.input_controller = InputController(self)
         self.thread_manager = ThreadManager(self)
         self.event_manager = EventManager(self)
@@ -230,20 +229,7 @@ class AutoDoorOCR:
         right_section = ctk.CTkFrame(header_content, fg_color='transparent')
         right_section.pack(side='right')
         
-        AnimatedButton(right_section, text='检查更新', width=70, height=26, 
-                      font=Theme.get_font('xs'),
-                      fg_color=Theme.COLORS['primary'], 
-                      hover_color=Theme.COLORS['primary_hover'],
-                      corner_radius=6, border_width=0,
-                      command=self.check_for_updates).pack(side='left', padx=4)
-        
-        AnimatedButton(right_section, text='工具介绍', width=70, height=26,
-                      font=Theme.get_font('xs'),
-                      fg_color=Theme.COLORS['primary'], 
-                      hover_color=Theme.COLORS['primary_hover'],
-                      corner_radius=6, border_width=0,
-                      command=open_tool_intro).pack(side='left', padx=4)
-        
+        # 移除了检查更新和工具介绍按钮
         # TODO: 夜间模式功能待后续迭代完善，目前暂时不在前端展示
         # 需要完善的工作：
         # 1. 所有组件的深色主题样式适配
@@ -359,17 +345,11 @@ class AutoDoorOCR:
         footer_content = ctk.CTkFrame(self.footer, fg_color='transparent')
         footer_content.pack(fill='x', padx=12, pady=4)
         
+        # 移除了作者B站链接相关代码
         ctk.CTkLabel(footer_content, 
-                    text=f'AutoDoor OCR v{VERSION} | 本程序仅供个人学习研究使用，禁止商用 | 制作人: ',
+                    text=f'AutoDoor OCR v{VERSION} | 本程序仅供个人学习研究使用，禁止商用',
                     font=Theme.get_font('xs'), 
                     text_color=Theme.COLORS['text_muted']).pack(side='left')
-        
-        author_label = ctk.CTkLabel(footer_content, text='Flown王砖家', 
-                                    font=Theme.get_font('xs'),
-                                    text_color=Theme.COLORS['primary'],
-                                    cursor='hand2')
-        author_label.pack(side='left')
-        author_label.bind('<Button-1>', lambda e: open_bilibili())
 
     def _show_page(self, page_id):
         for pid, page in self.pages.items():
@@ -449,10 +429,9 @@ class AutoDoorOCR:
         self.setup_shortcuts()
         self.event_manager.start_event_thread()
 
-        self.version_checker.start_auto_check()
+        # 移除了自动检查更新的代码
 
-    def check_for_updates(self):
-        self.version_checker.check_for_updates(manual=True)
+    # 移除了check_for_updates方法
 
     def cancel_selection(self):
         from utils.region import cancel_selection
