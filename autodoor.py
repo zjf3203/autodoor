@@ -35,8 +35,7 @@ from modules.background import BackgroundManager
 
 VERSION = "2.3.1"
 
-# 设置默认字体配置（加大加粗）
-ctk.set_default_font("Microsoft YaHei UI")
+# 移除不兼容的 set_default_font 调用，改为在每个组件上显式设置字体
 
 
 class AutoDoorOCR:
@@ -208,7 +207,7 @@ class AutoDoorOCR:
         left_section = ctk.CTkFrame(header_content, fg_color='transparent')
         left_section.pack(side='left')
         
-        # 加大加粗标题字体
+        # 加大加粗标题字体（显式设置字体）
         ctk.CTkLabel(left_section, text='◉', font=('Microsoft YaHei UI', 20, 'bold'), 
                     text_color=Theme.COLORS['primary']).pack(side='left', padx=(0, 10))
         ctk.CTkLabel(left_section, text='AutoDoor OCR', font=('Microsoft YaHei UI', 18, 'bold')).pack(side='left')
