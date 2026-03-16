@@ -23,7 +23,7 @@ from core.proxy import OCRProxy, TimedProxy, NumberProxy, ScriptProxy, ColorProx
 from input.permissions import PermissionManager
 from input.controller import InputController
 from input.keyboard import setup_shortcuts
-from utils.tesseract import TesseractManager  # 移除了VersionChecker和open相关导入
+from utils.tesseract import TesseractManager
 from modules.ocr import OCRModule
 from modules.timed import TimedModule
 from modules.number import NumberModule
@@ -34,6 +34,9 @@ from modules.image import ImageDetectionManager
 from modules.background import BackgroundManager
 
 VERSION = "2.3.1"
+
+# 设置默认字体配置（加大加粗）
+ctk.set_default_font("Microsoft YaHei UI")
 
 
 class AutoDoorOCR:
@@ -123,7 +126,6 @@ class AutoDoorOCR:
     def _init_managers(self):
         self.logging_manager = LoggingManager(self)
         self.logging_manager.log_message(f"[{self.platform_adapter.platform}] 日志文件路径: {self.log_file_path}")
-        # 移除了version_checker初始化
         self.input_controller = InputController(self)
         self.thread_manager = ThreadManager(self)
         self.event_manager = EventManager(self)
@@ -145,12 +147,12 @@ class AutoDoorOCR:
         
         self.root = ctk.CTk()
         self.root.title(f"AutoDoor OCR v{VERSION}")
-        self.root.geometry("1050x700")
-        self.root.minsize(950, 600)
+        # 加大窗口默认尺寸，提升操作体验
+        self.root.geometry("1200x800")
+        self.root.minsize(1000, 700)
         self.root.protocol("WM_DELETE_WINDOW", lambda: exit_program(self))
         
         self._set_icon()
-        
         self._init_tk_variables()
         self._create_layout()
 
@@ -195,63 +197,63 @@ class AutoDoorOCR:
         self._create_footer()
 
     def _create_header(self):
-        self.header = ctk.CTkFrame(self.root, height=44, corner_radius=0)
+        # 加高头部，提升视觉层级
+        self.header = ctk.CTkFrame(self.root, height=60, corner_radius=0)
         self.header.pack(fill='x')
         self.header.pack_propagate(False)
         
         header_content = ctk.CTkFrame(self.header, fg_color='transparent')
-        header_content.pack(fill='x', padx=12, pady=6)
+        header_content.pack(fill='x', padx=20, pady=8)
         
         left_section = ctk.CTkFrame(header_content, fg_color='transparent')
         left_section.pack(side='left')
         
-        ctk.CTkLabel(left_section, text='◉', font=Theme.get_font('xl'), 
-                    text_color=Theme.COLORS['primary']).pack(side='left', padx=(0, 6))
-        ctk.CTkLabel(left_section, text='AutoDoor OCR', font=Theme.get_font('lg')).pack(side='left')
-        ctk.CTkLabel(left_section, text=f'v{VERSION}', font=Theme.get_font('xs'), 
+        # 加大加粗标题字体
+        ctk.CTkLabel(left_section, text='◉', font=('Microsoft YaHei UI', 20, 'bold'), 
+                    text_color=Theme.COLORS['primary']).pack(side='left', padx=(0, 10))
+        ctk.CTkLabel(left_section, text='AutoDoor OCR', font=('Microsoft YaHei UI', 18, 'bold')).pack(side='left')
+        # 版本标签加大加粗
+        ctk.CTkLabel(left_section, text=f'v{VERSION}', font=('Microsoft YaHei UI', 12, 'bold'), 
                     text_color=Theme.COLORS['primary'],
-                    fg_color=Theme.COLORS['info_light'], corner_radius=4, 
-                    padx=6, pady=1).pack(side='left', padx=8)
+                    fg_color=Theme.COLORS['info_light'], corner_radius=6, 
+                    padx=8, pady=2).pack(side='left', padx=12)
         
         center_section = ctk.CTkFrame(header_content, fg_color='transparent')
         center_section.pack(side='left', expand=True)
         
         self.status_frame = ctk.CTkFrame(center_section, fg_color='transparent')
         self.status_frame.pack()
-        self.status_dot = ctk.CTkLabel(self.status_frame, text='●', font=('Arial', 10), 
+        # 状态指示器加大
+        self.status_dot = ctk.CTkLabel(self.status_frame, text='●', font=('Arial', 14, 'bold'), 
                                        text_color=Theme.COLORS['success'])
-        self.status_dot.pack(side='left', padx=(0, 4))
+        self.status_dot.pack(side='left', padx=(0, 6))
+        # 状态文字加粗加大
         self.status_label = ctk.CTkLabel(self.status_frame, textvariable=self.status_var, 
-                                         font=Theme.get_font('sm'), 
+                                         font=('Microsoft YaHei UI', 14, 'bold'), 
                                          text_color=Theme.COLORS['success'])
         self.status_label.pack(side='left')
         
         right_section = ctk.CTkFrame(header_content, fg_color='transparent')
         right_section.pack(side='right')
-        
-        # 移除了检查更新和工具介绍按钮
-        # TODO: 夜间模式功能待后续迭代完善，目前暂时不在前端展示
-        # 需要完善的工作：
-        # 1. 所有组件的深色主题样式适配
-        # 2. 颜色选择器的深色模式支持
-        # 3. 输入框和下拉框的深色模式样式
-        # 4. 状态指示器的深色模式颜色
-        # theme_frame = ctk.CTkFrame(right_section, fg_color='transparent')
-        # theme_frame.pack(side='left', padx=8)
-        # ctk.CTkLabel(theme_frame, text='夜间模式', font=Theme.get_font('xs'),
-        #             text_color=Theme.COLORS['text_secondary']).pack(side='left', padx=(0, 2))
-        # self.theme_switch = ctk.CTkSwitch(theme_frame, text='', width=36, 
-        #                                   command=self._toggle_theme, state='disabled')
-        # self.theme_switch.pack(side='left')
 
     def _create_main_container(self):
         self.main_container = ctk.CTkFrame(self.root, fg_color='transparent')
-        self.main_container.pack(fill='both', expand=True)
+        self.main_container.pack(fill='both', expand=True, padx=10, pady=10)
 
     def _create_sidebar(self):
-        self.sidebar = ctk.CTkFrame(self.main_container, width=180, corner_radius=0)
-        self.sidebar.pack(side='left', fill='y')
+        # 加宽侧边栏，提升操作舒适度
+        self.sidebar = ctk.CTkFrame(self.main_container, width=200, corner_radius=8)
+        self.sidebar.pack(side='left', fill='y', padx=(0, 10))
         self.sidebar.pack_propagate(False)
+        
+        # 侧边栏标题
+        sidebar_title = ctk.CTkLabel(
+            self.sidebar, 
+            text="功能菜单", 
+            font=('Microsoft YaHei UI', 16, 'bold'),
+            text_color=Theme.COLORS['text_primary']
+        )
+        sidebar_title.pack(pady=(15, 20), padx=20, anchor='w')
         
         nav_config = [
             ('home', '🏠', '首页'),
@@ -267,24 +269,29 @@ class AutoDoorOCR:
         for i, (page_id, icon, text) in enumerate(nav_config):
             item = self._create_nav_item(self.sidebar, text, icon, 
                                          lambda p=page_id: self._navigate_to(p), i == 0)
-            item.pack(fill='x')
+            item.pack(fill='x', padx=8, pady=4)
             self.nav_items[page_id] = item
 
     def _create_nav_item(self, master, text, icon, command, is_active):
-        frame = ctk.CTkFrame(master, fg_color='transparent', corner_radius=0)
-        indicator = ctk.CTkFrame(frame, width=3, height=22, fg_color='transparent', corner_radius=0)
-        indicator.pack(side='left', padx=(6, 0), pady=6)
+        # 导航项优化：加大高度、加粗字体
+        frame = ctk.CTkFrame(master, fg_color='transparent', corner_radius=8, height=50)
+        frame.pack_propagate(False)
+        
+        indicator = ctk.CTkFrame(frame, width=4, height=28, fg_color='transparent', corner_radius=2)
+        indicator.pack(side='left', padx=(8, 0), fill='y')
         
         content = ctk.CTkFrame(frame, fg_color='transparent')
-        content.pack(side='left', fill='x', expand=True, padx=6, pady=6)
+        content.pack(side='left', fill='x', expand=True, padx=10)
         
-        icon_label = ctk.CTkLabel(content, text=icon, font=('Segoe UI Emoji', 14), 
-                                  width=24, anchor='center')
+        # 图标加大
+        icon_label = ctk.CTkLabel(content, text=icon, font=('Segoe UI Emoji', 18, 'bold'), 
+                                  width=30, anchor='center')
         icon_label.pack(side='left')
         
-        text_label = ctk.CTkLabel(content, text=text, font=Theme.get_font('sm'), 
+        # 导航文字加粗加大
+        text_label = ctk.CTkLabel(content, text=text, font=('Microsoft YaHei UI', 14, 'bold'), 
                                   text_color=Theme.COLORS['text_secondary'], anchor='w')
-        text_label.pack(side='left', padx=(4, 0))
+        text_label.pack(side='left', padx=(8, 0))
         
         def on_enter(e):
             if not frame._is_active:
@@ -322,8 +329,9 @@ class AutoDoorOCR:
         return frame
 
     def _create_content_area(self):
-        self.content_area = ctk.CTkFrame(self.main_container, fg_color='transparent')
-        self.content_area.pack(side='left', fill='both', expand=True, padx=12, pady=12)
+        # 内容区域添加圆角和阴影，提升视觉效果
+        self.content_area = ctk.CTkFrame(self.main_container, fg_color='white', corner_radius=8)
+        self.content_area.pack(side='left', fill='both', expand=True)
         
         create_home_tab(self)
         create_ocr_tab(self)
@@ -338,23 +346,23 @@ class AutoDoorOCR:
         self._show_page('home')
 
     def _create_footer(self):
-        self.footer = ctk.CTkFrame(self.root, height=28, corner_radius=0)
+        # 加高底部栏，文字加粗
+        self.footer = ctk.CTkFrame(self.root, height=40, corner_radius=0)
         self.footer.pack(fill='x')
         self.footer.pack_propagate(False)
         
         footer_content = ctk.CTkFrame(self.footer, fg_color='transparent')
-        footer_content.pack(fill='x', padx=12, pady=4)
+        footer_content.pack(fill='x', padx=20, pady=8)
         
-        # 移除了作者B站链接相关代码
         ctk.CTkLabel(footer_content, 
                     text=f'AutoDoor OCR v{VERSION} | 本程序仅供个人学习研究使用，禁止商用',
-                    font=Theme.get_font('xs'), 
+                    font=('Microsoft YaHei UI', 12, 'bold'), 
                     text_color=Theme.COLORS['text_muted']).pack(side='left')
 
     def _show_page(self, page_id):
         for pid, page in self.pages.items():
             if pid == page_id:
-                page.pack(fill='both', expand=True)
+                page.pack(fill='both', expand=True, padx=20, pady=20)
             else:
                 page.pack_forget()
         
@@ -375,7 +383,6 @@ class AutoDoorOCR:
     def _navigate_to(self, page_id):
         self._show_page(page_id)
 
-    # TODO: 夜间模式切换功能，待后续迭代完善后启用
     def _toggle_theme(self):
         """切换日间/夜间模式"""
         current = ctk.get_appearance_mode()
@@ -428,10 +435,6 @@ class AutoDoorOCR:
 
         self.setup_shortcuts()
         self.event_manager.start_event_thread()
-
-        # 移除了自动检查更新的代码
-
-    # 移除了check_for_updates方法
 
     def cancel_selection(self):
         from utils.region import cancel_selection
